@@ -154,8 +154,8 @@ def main():
 
 		Xnew = LinearTriangulation(P0, P, points_RANSAC)
 
-		print("IM%d--LinearTriangulation--Mean Reprojection Error: %f" %\
-		(i+1,np.mean(reprojErr(Xnew,points_RANSAC[:,2:],Pnew))))
+		# print("IM%d--LinearTriangulation--Mean Reprojection Error: %f" %\
+		# (i+1,np.mean(reprojErr(Xnew,points_RANSAC[:,2:],Pnew))))
 
 		Xnew_nl, residual = NonlinearTriangulation(Xnew, P0, Pnew, points_RANSAC, max_nfev=100)
 		
