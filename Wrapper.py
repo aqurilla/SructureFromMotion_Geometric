@@ -140,6 +140,8 @@ def main():
 		X,x = getWorldPts(im2world,i,points_RANSAC)
 
 		X_RANSAC, x_RANSAC , RC = PnPRANSAC(X, x, K)
+		print(X_RANSAC.shape)
+		print(x_RANSAC.shape)
 		RC_nl = NonlinearPnP(X_RANSAC, x_RANSAC, K, RC)
 		Rnew = RC_nl[:,:3]
 		Cnew = RC_nl[:,-1]

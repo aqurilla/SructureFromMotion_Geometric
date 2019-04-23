@@ -40,22 +40,22 @@ def reprojErr(X,x,P):
 	fracs = np.vstack([PX[0,:]/PX[2,:],PX[1,:]/PX[2,:]])
 	return sum((x - fracs)**2,0)
 
-def PnPRANSAC(X,x,K,eps=0.01,numIters=1000):
+def PnPRANSAC(X,x,K,eps=400000,numIters=2000):
 	# X is 3xN, x is 2xN, K is 3x3
 	l = X.shape[1]
 	sampleids = range(l)
 	Xhat = np.vstack([X,np.ones([1,l])])
 	xhat = np.vstack([x,np.ones([1,l])])
-	bestInliers = np.zeros(l)
+	bestInliers = np.zeros(l,dtype=np.bool)
 	bestRC = np.zeros([3,4])
 	for _ in range(numIters):
 		pointids = sample(sampleids,6)
 		Xs = Xhat[:,pointids]
 		xs = xhat[:,pointids]
-		print(Xs.shape,xs.shape)
 		RC = LinearPnP(Xs,xs,K)
 		P = np.matmul(K,RC*np.array([1,1,1,-1]))
-		inliers = np.less(reprojErr(Xhat,x,P),eps)
+		re = reprojErr(Xhat,x,P)
+		inliers = np.less(re,eps)
 		if sum(inliers) > sum(bestInliers):
 			bestInliers = inliers
 			bestRC = RC
@@ -71,7 +71,7 @@ def NonlinearPnP(X,x,K,RC):
 		C = qc[4:].reshape([3,1])
 		return reprojErr(X,x,np.matmul(K,np.concatenate([R,-C],1)))
 	qc = leastsq(obj,np.concatenate([R2q(R),C]),args=(Xhat,x))[0]
-	return np.concatenate(q2R(qc[:4]),rc[4:].reshape([3,1]),1)
+	return np.concatenate([q2R(qc[:4]),qc[4:].reshape([3,1])],1)
 
 def BuildVisibilityMatrix(nCams,im2world):
 	wcs = np.unique(np.array(list(im2world.values())),axis=0)
@@ -80,15 +80,13 @@ def BuildVisibilityMatrix(nCams,im2world):
 	x = np.zeros([wcs.size,nCams,2])
 	for ((camidx,u,v),wc) in im2world.items():
 		row = wc2idx[tuple(wc)]
-		print(row)
-		print(camidx)
 		V[row,camidx] = 1
 		x[row,camidx,0] = u
 		x[row,camidx,1] = v
 	return V,wcs,x
 
 def R2r(R):
-	out,_ = Rodrigues(R,np.zeros([3,1]))
+	out,_ = Rodrigues(R,np.zeros(3))
 	return out
 
 def r2R(r):
