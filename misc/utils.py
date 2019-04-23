@@ -11,6 +11,31 @@ import argparse
 import pdb
 import glob
 from scipy.optimize import least_squares
+import matplotlib.pyplot as plt
+import matplotlib
+
+def drawCorrespondences(imnum1, imnum2, points_RANSAC, imgpath):
+	im1 = cv2.imread(imgpath+str(imnum1)+'.jpg',1)
+	im2 = cv2.imread(imgpath+str(imnum2)+'.jpg',1)
+	matchesarr = np.array([i for i in range(points_RANSAC.shape[0])])
+
+	matchImg = cv2.drawMatches(im1,[cv2.KeyPoint(x,y,4) for y,x in points_RANSAC[:,:2]] \
+								,im2,[cv2.KeyPoint(x,y,4) for y,x in points_RANSAC[:,2:]],\
+								[cv2.DMatch(idx,idx,0.5) for idx in range(len(points_RANSAC))], None)
+
+	cv2.imshow('Output image', matchImg)
+	cv2.waitKey(0)
+
+def dispTriangulation(X, X_nl, P):
+	# Display linear and non-linear triangulation output
+	# X - Nx3, X_nl - Nx3, P-3x4
+	plt.scatter(X[:,0], X[:,2], c="r",alpha=0.5, label="Linear Triangulation")
+	plt.scatter(X_nl[:,0], X_nl[:,2], alpha=0.5, c="g", label="Nonlinear Triangulation")
+	plt.scatter(P[0][3], P[2][3], c='b', marker=matplotlib.markers.CARETDOWN)
+	plt.xlabel("X")
+	plt.ylabel("Z")
+	plt.legend()
+	plt.show()
 
 def parsePoints(imnum_1, imnum_2, txtpath):
 	# Parse the provided text files to extract the corresponding points
