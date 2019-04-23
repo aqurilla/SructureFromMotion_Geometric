@@ -113,19 +113,16 @@ def main():
 	C, R, X0 = DisambiguateCameraPose_2Check(Cset, Rset, Xset, K, points_RANSAC)
 	P = ExtractCameraPose(K,C,R)
 
+	print("IM1 Mean Reprojection Error: %f" % np.mean(reprojErr(X0,points_RANSAC[:,2:],P)))
 	'''
 	Non-linear optimization of triangulation
 	'''
 	# X0_nl are the non-linearly optimized points
 	X0_nl, residual = NonlinearTriangulation(X0, P0, P, points_RANSAC, max_nfev=100)
 
+	print("IM1--NLTriangulation--Mean Reprojection Error: %f" % np.mean(reprojErr(X0_nl,points_RANSAC[:,2:],P)))
 	# Display triangulation points obtained
 	# dispTriangulation(X0, X0_nl, P)
-
-	Cset = []
-	Rset = []
-	Cset.append(C)
-	Rset.append(R)
 
 	CRCs = np.hstack([R,C.reshape([3,1])]).reshape([3,4,1])
 
@@ -143,8 +140,6 @@ def main():
 		RC_nl = NonlinearPnP(X_RANSAC, x_RANSAC, K, RC)
 		Rnew = RC_nl[:,:3]
 		Cnew = RC_nl[:,-1]
-		Cset.append(Cnew)
-		Rset.append(Rnew)
 
 		CRCs = np.concatenate([CRCs,RC_nl.reshape([3,4,1])],2)
 		
