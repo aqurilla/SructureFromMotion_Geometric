@@ -208,7 +208,7 @@
 % not capitalized unless they are the first or last word of the title.
 % Linebreaks \\ can be used within to get better formatting as desired.
 % Do not put math or special symbols in the title.
-\title{CMSC733\\Project 3: Structure From Motion}
+\title{CMSC733\\Project 3: Structure From Motion---Traditional Approach}
 
 
 % author names and affiliations
@@ -222,8 +222,7 @@ University of Maryland - College Park\\
 UID: 113638855}
 \and
 \IEEEauthorblockN{Jo Shoemaker}
-\IEEEauthorblockA{Computational Linguistics and Information Processing Lab\\University of Maryland - College Park\\UID: 115506787}
-
+\IEEEauthorblockA{Computational Linguistics and\\Information Processing Lab\\University of Maryland - College Park\\UID: 115506787}
 }
 
 
@@ -241,8 +240,20 @@ UID: 113638855}
 %
 % For peerreview papers, this IEEEtran command inserts a page break and
 % creates the second title. It will be ignored for other modes.
-\IEEEpeerreviewmaketitle
 
+Given images of a scene taken from different positions, it is possible to estimate the real-world, three-dimensional positions of elements in the scene. This has been called the Structure from Motion problem. Our implementation presumes a set of given images $I$ taken by a camera with pre-calibrated intrinsic matrix $K$, and preliminary corresponding points $M_{ij}$ mapped between all images $i$ and $j$. Using these values, we are able to estimate camera poses $P_i$ for all images in $I$ and positions in three-dimensional space for a subset of the points in $M$. We use several techniques to refine these initial estimates. 
+
+\section{Initial Camera Pose Estimation}
+
+\section{Initial 3D Position Estimation}
+
+\section{Additional Camera Pose Estimations}
+Once an initial set of 3D points $X_0$ is established
+
+\subsection{Perspective-N-Point solution and RANSAC}
+\subsection{Refining Camera Pose with NonlinearPnP}
+
+\section{Bundle Adjustment}
 
 
 
