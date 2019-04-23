@@ -138,5 +138,5 @@ def BundleAdjustment(X,x,K,CRCs,V):
 	cams = Cam2sba(6, CRCs, K)
 	newcams, newpts, info = sba.SparseBundleAdjust(cams,pts)
 	newcams = sba2Cam(newcams)
-
+	newpts = newpts._getB()
 	return newcams, newpts, info

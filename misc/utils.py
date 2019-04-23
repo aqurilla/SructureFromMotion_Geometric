@@ -24,6 +24,7 @@ def drawCorrespondences(imnum1, imnum2, points_RANSAC, imgpath):
 								[cv2.DMatch(idx,idx,0.5) for idx in range(len(points_RANSAC))], None)
 
 	cv2.imshow('Output image', matchImg)
+	cv2.imwrite("../Data/Correspondences_%d_%d.png" % (imnum1,imnum2),matchImg)
 	cv2.waitKey(0)
 
 def dispTriangulation(X, X_nl, P):
