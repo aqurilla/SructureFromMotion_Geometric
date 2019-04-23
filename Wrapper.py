@@ -138,7 +138,7 @@ def main():
 		Cset.append(Cnew)
 		Rset.append(Rnew)
 
-		
+		CRCs = CRCs.stack([CRCs,RC_nl.reshape([3,4,1])],2)
 		
 		Pnew = ExtractCameraPose(K,Cnew,Rnew)
 		Xnew = LinearTriangulation(P0, P, points_RANSAC)
