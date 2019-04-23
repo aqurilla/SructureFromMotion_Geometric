@@ -4,6 +4,7 @@ from scipy.optimize import leastsq
 from cv2 import Rodrigues
 from scipy.spatial.transform import Rotation as Rot
 import sba
+import pdb
 
 
 def LinearPnP(X,x,K):
@@ -22,13 +23,15 @@ def impts2wpts(curDict,camidx,newX,newx):
 	return curDict
 
 def getWorldPts(im2world,fromIdx,ptCorresps):
-	x = np.empty([2,0])
-	X = np.empty([3,0])
+	x = np.zeros((2,1))
+	X = np.zeros((3,1))
 	for ptc in ptCorresps:
 		tup = (fromIdx,ptc[0],ptc[1])
 		if tup in im2world:
-			x= np.append(x,ptc[2:])
-			X= np.append(X,im2world[tup])
+			x= np.hstack((x,ptc[2:].reshape((2,1))))
+			X= np.hstack((X,im2world[tup].reshape((3,1))))
+	x = x[:,1:]
+	X = X[:,1:]
 	return X,x
 
 def reprojErr(X,x,P):
@@ -103,26 +106,37 @@ def R2q(R):
 # def camArray2
 
 def Cam2sba(n, CRCs, K):
-    # n - number of cameras
-    sbainp = np.zeros((n, 17))
+	# n - number of cameras
+	sbainp = np.zeros((n, 17))
 
-    sbainp[:,0] = K[0][0] # fx
-    sbainp[:,1] = K[0][2] # cx
-    sbainp[:,2] = K[1][2] # cy
-    sbainp[:,3] = 1       # AR
-    sbainp[:,4] = K[0][1] # s
+	sbainp[:,0] = K[0][0] # fx
+	sbainp[:,1] = K[0][2] # cx
+	sbainp[:,2] = K[1][2] # cy
+	sbainp[:,3] = 1       # AR
+	sbainp[:,4] = K[0][1] # s
 
-    for i in range(n):
-        R = (CRCs[:,:,i])[:,:3]
-        C = (CRCs[:,:,i])[:,3]
-        sbainp[:,10:14] = R2q(R)
-        sbainp[:,11:] = Cset[i].reshape(C)
+	for i in range(n):
+		R = (CRCs[:,:,i])[:,:3]
+		C = (CRCs[:,:,i])[:,3]
+		sbainp[i,10:14] = R2q(R)
+		sbainp[i,11:] = C.reshape((1,3))
 
-    return sbainp
+	return sbainp
+
+def sba2Cam(newcams):
+	CRCs = np.zeros((3,4,newcams.shape[0]))
+	for i in range(newcams.shape[0]):
+		R = q2R(newcams[i,10:14])
+		C = newcams[i,11:]
+		CRCs[:,:3,i] = R
+		CRCs[:,3,i] = C
+
+	return CRCs
 
 def BundleAdjustment(X,x,K,CRCs,V):
 	# X is 3xN, x is 2xN, CKs is 3x3xI, CRCs is 3x4xI, V is IxN
 	pts = sba.Points(X,x,V)
 	cams = Cam2sba(6, CRCs, K)
-	# newcams, newpts, info = sba.SparseBundleAdjust(cams,pts)
-	return sba.SparseBundleAdjust(cams,pts)
+	newcams, newpts, info = sba.SparseBundleAdjust(cams,pts)
+	newcams = sba2Cam(newcams)
+	return newcams, newpts
