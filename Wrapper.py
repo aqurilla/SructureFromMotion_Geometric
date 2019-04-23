@@ -127,7 +127,7 @@ def main():
 	Cset.append(C)
 	Rset.append(R)
 
-	CRCs = np.hstack([R,C.reshape([3,1])])
+	CRCs = np.hstack([R,C.reshape([3,1])]).reshape([3,4,1])
 
 	im2world = impts2wpts(dict(),1,X0_nl,points_RANSAC[:,:2])
 	im2world = impts2wpts(im2world,2,X0_nl,points_RANSAC[:,2:])
@@ -148,7 +148,7 @@ def main():
 		Cset.append(Cnew)
 		Rset.append(Rnew)
 
-		CRCs = np.stack([CRCs,RC_nl.reshape([3,4,1])],2)
+		CRCs = np.concatenate([CRCs,RC_nl.reshape([3,4,1])],2)
 		
 		Pnew = ExtractCameraPose(K,Cnew,Rnew)
 		Xnew = LinearTriangulation(P0, P, points_RANSAC)
