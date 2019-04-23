@@ -146,14 +146,14 @@ def main():
 		# # X = np.append(X, Xnew_nl, axis=0)
 
 		# BuildVisibilityMatrix
-        V,X,x = BuildVisibilityMatrix(6,im2world)
+		V,X,x = BuildVisibilityMatrix(6,im2world)
 
-        pdb.set_trace()
+		pdb.set_trace()
 
 		# BundleAdjustment
-        newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
+		newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
 
-        pdb.set_trace()
+		pdb.set_trace()
 
 if __name__ == '__main__':
 	main()
