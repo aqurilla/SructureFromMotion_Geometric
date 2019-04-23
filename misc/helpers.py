@@ -74,14 +74,17 @@ def NonlinearPnP(X,x,K,RC):
 	return np.concatenate(q2R(qc[:4]),rc[4:].reshape([3,1]),1)
 
 def BuildVisibilityMatrix(nCams,im2world):
-	wcs = np.unique(im2world.values())
-	wc2idx = dict(zip([tuple(wc) for wc in wcs],np.arange(wcs.size)))
+	wcs = np.unique(np.array(list(im2world.values())),axis=0)
+	wc2idx = dict(zip([tuple(wc) for wc in wcs],np.arange(wcs.size,dtype=np.int32)))
 	V = np.zeros([wcs.size,nCams])
 	x = np.zeros([wcs.size,nCams,2])
-	for ((camidx,x,y),wc) in im2world.items():
+	for ((camidx,u,v),wc) in im2world.items():
 		row = wc2idx[tuple(wc)]
+		print(row)
+		print(camidx)
 		V[row,camidx] = 1
-		x[row,camidx,:] = np.array([x,y])
+		x[row,camidx,0] = u
+		x[row,camidx,1] = v
 	return V,wcs,x
 
 def R2r(R):
