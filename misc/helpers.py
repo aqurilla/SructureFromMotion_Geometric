@@ -103,8 +103,6 @@ def q2R(q):
 def R2q(R):
 	return r2q(R2r(R))
 
-# def camArray2
-
 def Cam2sba(n, CRCs, K):
 	# n - number of cameras
 	sbainp = np.zeros((n, 17))
@@ -139,4 +137,5 @@ def BundleAdjustment(X,x,K,CRCs,V):
 	cams = Cam2sba(6, CRCs, K)
 	newcams, newpts, info = sba.SparseBundleAdjust(cams,pts)
 	newcams = sba2Cam(newcams)
-	return newcams, newpts
+
+	return newcams, newpts, info

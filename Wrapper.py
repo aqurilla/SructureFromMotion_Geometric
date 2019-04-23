@@ -123,11 +123,11 @@ def main():
 	im2world = impts2wpts(im2world,2,X0_nl,points_RANSAC[:,2:])
 
 	for i in range(2,6):
-		print("Image #:"+str(i))
+		print("Image #"+str(i))
 		points_mat = parsePoints(i, i+1, txtpath) # Parse points from matchingi.txt
 		points_RANSAC = GetInlierRANSAC(points_mat)
 
-        X,x = getWorldPts(im2world,i,points_RANSAC)
+		X,x = getWorldPts(im2world,i,points_RANSAC)
 
 		# X_RANSAC, x_RANSAC , RC = PnPRANSAC(X, x, K)
 		# RC_nl = NonlinearPnP(X_RANSAC, x_RANSAC, K, RC)
@@ -144,18 +144,16 @@ def main():
 		#
 		# im2world = impts2wpts(im2world, i+1, Xnew_nl, x_RANSAC)
 		# # X = np.append(X, Xnew_nl, axis=0)
-		#
-		pdb.set_trace()
 
 		# BuildVisibilityMatrix
-		V,X,x = BuildVisibilityMatrix(6,im2world)
+        V,X,x = BuildVisibilityMatrix(6,im2world)
 
-		pdb.set_trace()
+        pdb.set_trace()
 
 		# BundleAdjustment
-		newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
+        newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
 
-		pdb.set_trace()
+        pdb.set_trace()
 
 if __name__ == '__main__':
 	main()
