@@ -1,1 +1,1 @@
-# SructureFromMotion_Geometric
+# Python program for implementing geometric structure from motion
