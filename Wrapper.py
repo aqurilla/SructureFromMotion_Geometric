@@ -33,11 +33,13 @@ def main():
 	#Parser.add_argument('--imnum_1', default=1, help='Image number of 1st image')
 	#Parser.add_argument('--imnum_2', default=2, help='Image number of 2nd image')
 	Parser.add_argument('--txtpath', default='../Data/matching', help='Prefix path to correspondence files')
+	Parser.add_argument('--imgpath', default='../Data/', help='Prefix path to image files')
 
 	Args = Parser.parse_args()
 	#imnum_1 = int(Args.imnum_1)
 	#imnum_2 = int(Args.imnum_2)
 	txtpath = Args.txtpath
+	imgpath = Args.imgpath
 
 	# X0_nloptim, residual, F_RANSAC, E_recon, C, R, P = Estimate3DPoints(imnum_1, imnum_2, txtpath)
 
@@ -48,6 +50,9 @@ def main():
 	points_mat = parsePoints(1, 2, txtpath)
 
 	points_RANSAC = GetInlierRANSAC(points_mat)
+
+	# Display correspondence image
+	# drawCorrespondences(1,2,points_RANSAC, imgpath)
 
 	# Fundamental matrix using inliers
 	F_RANSAC = EstimateFundamentalMatrix(points_RANSAC)
@@ -114,6 +119,9 @@ def main():
 	# X0_nl are the non-linearly optimized points
 	X0_nl, residual = NonlinearTriangulation(X0, P0, P, points_RANSAC, max_nfev=100)
 
+	# Display triangulation points obtained
+	# dispTriangulation(X0, X0_nl, P)
+
 	Cset = []
 	Rset = []
 	Cset.append(C)
@@ -147,8 +155,6 @@ def main():
 
 		# BuildVisibilityMatrix
 		V,X,x = BuildVisibilityMatrix(6,im2world)
-
-		pdb.set_trace()
 
 		# BundleAdjustment
 		newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
