@@ -119,6 +119,8 @@ def main():
 	Cset.append(C)
 	Rset.append(R)
 
+	CRCs = np.hstack([R,C.reshape([3,1])])
+
 	im2world = impts2wpts(dict(),1,X0_nl,points_RANSAC[:,:2])
 	im2world = impts2wpts(im2world,2,X0_nl,points_RANSAC[:,2:])
 
@@ -129,21 +131,23 @@ def main():
 
 		X,x = getWorldPts(im2world,i,points_RANSAC)
 
-		# X_RANSAC, x_RANSAC , RC = PnPRANSAC(X, x, K)
-		# RC_nl = NonlinearPnP(X_RANSAC, x_RANSAC, K, RC)
-		# Rnew = RC_nl[:,:3]
-		# Cnew = RC_nl[:,-1]
-		# Cset.append(Cnew)
-		# Rset.append(Rnew)
-		#
-		# Pnew = ExtractCameraPose(K,Cnew,Rnew)
-		# Xnew = LinearTriangulation(P0, P, points_RANSAC)
-		# Xnew_nl, residual = NonlinearTriangulation(Xnew, P0, Pnew, points_RANSAC, max_nfev=100)
-		#
-		# pdb.set_trace()
-		#
-		# im2world = impts2wpts(im2world, i+1, Xnew_nl, x_RANSAC)
-		# # X = np.append(X, Xnew_nl, axis=0)
+		X_RANSAC, x_RANSAC , RC = PnPRANSAC(X, x, K)
+		RC_nl = NonlinearPnP(X_RANSAC, x_RANSAC, K, RC)
+		Rnew = RC_nl[:,:3]
+		Cnew = RC_nl[:,-1]
+		Cset.append(Cnew)
+		Rset.append(Rnew)
+
+		
+		
+		Pnew = ExtractCameraPose(K,Cnew,Rnew)
+		Xnew = LinearTriangulation(P0, P, points_RANSAC)
+		Xnew_nl, residual = NonlinearTriangulation(Xnew, P0, Pnew, points_RANSAC, max_nfev=100)
+		
+		pdb.set_trace()
+		
+		im2world = impts2wpts(im2world, i+1, Xnew_nl, x_RANSAC)
+		# X = np.append(X, Xnew_nl, axis=0)
 
 		# BuildVisibilityMatrix
 		V,X,x = BuildVisibilityMatrix(6,im2world)
