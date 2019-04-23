@@ -208,14 +208,23 @@
 % not capitalized unless they are the first or last word of the title.
 % Linebreaks \\ can be used within to get better formatting as desired.
 % Do not put math or special symbols in the title.
-\title{CMSC733\\Homework 1}
+\title{CMSC733\\Project 3: Structure From Motion}
 
 
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Jo Shoemaker}
-\IEEEauthorblockA{Computational Linguistics and Information Processing Lab\\University of Maryland}}
+\author{
+
+\IEEEauthorblockN{Nitin Suresh}
+\IEEEauthorblockA{School of Electrical and\\Computer Engineering\\
+University of Maryland - College Park\\
+UID: 113638855}
+\and
+\IEEEauthorblockN{Jo Shoemaker}
+\IEEEauthorblockA{Computational Linguistics and Information Processing Lab\\University of Maryland - College Park\\UID: 115506787}
+
+}
 
 
 % use for special paper notices
@@ -234,18 +243,7 @@
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
 
-\section{Initial Parameter Estimation}
-Initial intrinsic and extrinsic parameters were estimated as described in Section 3.3 of \cite{zhang2000flexible}. One interesting fact I noted during this process was how much of a difference it made which corresponding points were selected to estimate the initial homography between reference and sample images. Initially I would select four random point pairs for each homography estimation, and the resulting \textbf{K} values would vary greatly. Ultimately I switched to using the outermost corners as the reference points for all homographies.\par
-The resulting \textbf{K} matrix for camera internals is shown in Figure~\ref{fig:init}. 
-\begin{figure}[h] %  figure placement: here, top, bottom, or page
-   \centering
-   \includegraphics[width=4in]{kmat} 
-   \caption{Initial camera-internal matrix \textbf{K} estimated analytically}
-   \label{fig:init}
-\end{figure}
 
-\section{Error Minimization}
-Error minimization was attempted but not achieved by this author. I still do not fully understand how \texttt{scipy}'s optimization functions work---my code as written throws an error, complaining that there are more parameters to optimize than data points to optimize from. As a result of this setback I was unable to produce rectified images. So it goes.
 
 
 % An example of a floating figure using the graphicx package.
