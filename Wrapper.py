@@ -136,12 +136,12 @@ def main():
 
 		X,x = getWorldPts(im2world,i,points_RANSAC)
 
-		X_RANSAC, x_RANSAC , RC = PnPRANSAC(X, x, K)
+		RC = PnPRANSAC(X, x, K)
 
 		#print("IM%d--Initial--Mean Reprojection Error: %f" %\
-		#		(i+1,np.mean(reprojErr(X_RANSAC,x_RANSAC[:,2:],ExtractCameraPose(K,RC[:,3],RC[:,:3])))))
+		#		(i+1,np.mean(reprojErr(X,x,ExtractCameraPose(K,RC[:,3],RC[:,:3])))))
 
-		RC_nl = NonlinearPnP(X_RANSAC, x_RANSAC, K, RC)
+		RC_nl = NonlinearPnP(X, x, K, RC)
 		Rnew = RC_nl[:,:3]
 		Cnew = RC_nl[:,-1]
 
@@ -150,7 +150,7 @@ def main():
 		Pnew = ExtractCameraPose(K,Cnew,Rnew)
 
 		#print("IM%d--NonlinearPnP--Mean Reprojection Error: %f" %\
-		#(i+1,np.mean(reprojErr(X_RANSAC,x_RANSAC[:,2:],Pnew))))
+		#(i+1,np.mean(reprojErr(X,x,Pnew))))
 
 		Xnew = LinearTriangulation(P0, P, points_RANSAC)
 
@@ -158,8 +158,8 @@ def main():
 		# (i+1,np.mean(reprojErr(Xnew,points_RANSAC[:,2:],Pnew))))
 
 		Xnew_nl, residual = NonlinearTriangulation(Xnew, P0, Pnew, points_RANSAC, max_nfev=100)
-
-		im2world = impts2wpts(im2world, i+1, Xnew_nl, x_RANSAC)
+		im2world = impts2wpts(im2world, i+1, Xnew_nl, points_RANSAC[:,2:])
+		im2world = impts2wpts(im2world, i, Xnew_nl, points_RANSAC[:,:2])
 		# X = np.append(X, Xnew_nl, axis=0)
 
 	pdb.set_trace()

@@ -40,7 +40,7 @@ def reprojErr(X,x,P):
 	fracs = np.vstack([PX[0,:]/PX[2,:],PX[1,:]/PX[2,:]])
 	return sum((x - fracs)**2,0)
 
-def PnPRANSAC(X,x,K,eps=400000,numIters=2000):
+def PnPRANSAC(X,x,K,eps=500000,numIters=2000):
 	# X is 3xN, x is 2xN, K is 3x3
 	l = X.shape[1]
 	sampleids = range(l)
@@ -59,7 +59,7 @@ def PnPRANSAC(X,x,K,eps=400000,numIters=2000):
 		if sum(inliers) > sum(bestInliers):
 			bestInliers = inliers
 			bestRC = RC
-	return X[:,bestInliers],x[:,bestInliers],bestRC
+	return bestRC
 
 def NonlinearPnP(X,x,K,RC):
 	# X is 3xN, x is 2xN, K is 3x3, RC is 3x4
@@ -80,9 +80,9 @@ def BuildVisibilityMatrix(nCams,im2world):
 	x = np.zeros([wcs.shape[0],nCams,2])
 	for ((camidx,u,v),wc) in im2world.items():
 		row = wc2idx[tuple(wc)]
-		V[row,camidx] = 1
-		x[row,camidx,0] = u
-		x[row,camidx,1] = v
+		V[row,camidx-1] = 1
+		x[row,camidx-1,0] = u
+		x[row,camidx-1,1] = v
 	return V,wcs,x
 
 def R2r(R):
