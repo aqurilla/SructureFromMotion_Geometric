@@ -52,7 +52,7 @@ def main():
 	points_RANSAC = GetInlierRANSAC(points_mat)
 
 	# Display correspondence image
-	# drawCorrespondences(1,2,points_RANSAC, imgpath)
+	drawCorrespondences(1,2,points_RANSAC, imgpath)
 
 	# Fundamental matrix using inliers
 	F_RANSAC = EstimateFundamentalMatrix(points_RANSAC)
@@ -113,16 +113,16 @@ def main():
 	C, R, X0 = DisambiguateCameraPose_2Check(Cset, Rset, Xset, K, points_RANSAC)
 	P = ExtractCameraPose(K,C,R)
 
-	# print("IM1--Initial--Mean Reprojection Error: %f" % np.mean(reprojErr(X0,points_RANSAC[:,2:],P)))
+	print("IM1--Initial--Mean Reprojection Error: %f" % np.mean(reprojErr(X0.transpose(),points_RANSAC[:,2:].transpose(),P)))
 	'''
 	Non-linear optimization of triangulation
 	'''
 	# X0_nl are the non-linearly optimized points
 	X0_nl, residual = NonlinearTriangulation(X0, P0, P, points_RANSAC, max_nfev=100)
 
-	# print("IM1--NLTriangulation--Mean Reprojection Error: %f" % np.mean(reprojErr(X0_nl,points_RANSAC[:,2:],P)))
+	print("IM1--NLTriangulation--Mean Reprojection Error: %f" % np.mean(reprojErr(X0_nl.transpose(),points_RANSAC[:,2:].transpose(),P)))
 	# Display triangulation points obtained
-	# dispTriangulation(X0, X0_nl, P)
+	dispTriangulation(X0, X0_nl, P)
 
 	CRCs = np.hstack([R,C.reshape([3,1])]).reshape([3,4,1])
 
@@ -133,13 +133,13 @@ def main():
 		print("Image #"+str(i))
 		points_mat = parsePoints(i, i+1, txtpath) # Parse points from matchingi.txt
 		points_RANSAC = GetInlierRANSAC(points_mat)
-
+		drawCorrespondences(i,i+1,points_RANSAC, imgpath)
 		X,x = getWorldPts(im2world,i,points_RANSAC)
 
 		RC = PnPRANSAC(X, x, K)
 
-		#print("IM%d--Initial--Mean Reprojection Error: %f" %\
-		#		(i+1,np.mean(reprojErr(X,x,ExtractCameraPose(K,RC[:,3],RC[:,:3])))))
+		print("IM%d--Initial--Mean Reprojection Error: %f" %\
+				(i+1,np.mean(reprojErr(X,x,ExtractCameraPose(K,RC[:,3],RC[:,:3])))))
 
 		RC_nl = NonlinearPnP(X, x, K, RC)
 		Rnew = RC_nl[:,:3]
@@ -149,28 +149,29 @@ def main():
 
 		Pnew = ExtractCameraPose(K,Cnew,Rnew)
 
-		#print("IM%d--NonlinearPnP--Mean Reprojection Error: %f" %\
-		#(i+1,np.mean(reprojErr(X,x,Pnew))))
+		print("IM%d--NonlinearPnP--Mean Reprojection Error: %f" %\
+		(i+1,np.mean(reprojErr(X,x,Pnew))))
 
 		Xnew = LinearTriangulation(P0, P, points_RANSAC)
 
-		# print("IM%d--LinearTriangulation--Mean Reprojection Error: %f" %\
-		# (i+1,np.mean(reprojErr(Xnew,points_RANSAC[:,2:],Pnew))))
+		print("IM%d--LinearTriangulation--Mean Reprojection Error: %f" %\
+				(i+1,np.mean(reprojErr(Xnew.transpose(),points_RANSAC[:,2:].transpose(),Pnew))))
 
 		Xnew_nl, residual = NonlinearTriangulation(Xnew, P0, Pnew, points_RANSAC, max_nfev=100)
+		
+		dispTriangulation(Xnew, Xnew_nl, P)
+
+		print("IM%d--NonlinearTriangulation--Mean Reprojection Error: %f" %\
+		(i+1,np.mean(reprojErr(Xnew_nl.transpose(),points_RANSAC[:,2:].transpose(),Pnew))))
+
 		im2world = impts2wpts(im2world, i+1, Xnew_nl, points_RANSAC[:,2:])
 		im2world = impts2wpts(im2world, i, Xnew_nl, points_RANSAC[:,:2])
-		# X = np.append(X, Xnew_nl, axis=0)
 
-	pdb.set_trace()
 	# BuildVisibilityMatrix
 	V,X,x = BuildVisibilityMatrix(6,im2world)
 
-	pdb.set_trace()
 	# BundleAdjustment
 	newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
-
-	pdb.set_trace()
 
 if __name__ == '__main__':
 	main()

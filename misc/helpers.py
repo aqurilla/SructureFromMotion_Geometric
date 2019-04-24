@@ -36,6 +36,8 @@ def getWorldPts(im2world,fromIdx,ptCorresps):
 
 def reprojErr(X,x,P):
 	# X is 4xN, x is 2xN, P is 3x3
+	if X.shape[0] ==3:
+		X = np.vstack([X,np.ones([1,X.shape[1]])])
 	PX = np.matmul(P,X)
 	fracs = np.vstack([PX[0,:]/PX[2,:],PX[1,:]/PX[2,:]])
 	return sum((x - fracs)**2,0)
