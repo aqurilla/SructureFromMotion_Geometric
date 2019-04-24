@@ -248,10 +248,18 @@ Given images of a scene taken from different positions, it is possible to estima
 \section{Initial 3D Position Estimation}
 
 \section{Additional Camera Pose Estimations}
-Once an initial set of 3D points $X_0$ is established
+Once we have a fairly reliable set of 3D and image point correspondences to work with, we estimate each additional image's camera poses. 
 
-\subsection{Perspective-N-Point solution and RANSAC}
+\subsection{Perspective-N-Point solution and \textsc{RANSAC}}
+Once an initial set of 3D points $X_i$ is corresponded with image points $x_i$ for image $i$, we algebraically solve for $P_i$ in \texttt{LinearPnP.py}. Using six pairs of points $S_i$ and $s_i$ sampled from $X_i$ and $x_i$, we solve the system
+\[S_i^T\left[R_i,t_i\right]^T = \left(Ks_i\right)^T\]
+for $\left[R,t\right]^T$. We negate $R$ if its determinant is $-1$. Then we find $C_i$ by multiplying $t_i$ by the transpose of $R_i$. With these components it is trivial to find $P_i$.
+\par
+Because our data is noisy, we refine our initial estimate of $P_i$ using the \textsc{RANSAC} algorithm to minimize reprojection error. For each image's $P$ estimate, we run \texttt{PnPRANSAC.py} for 2,000 iterations with a tolerable reprojection error of $500,000$. This also removes outliers from our $X_i$ and $x_i$ point correspondences.
+
 \subsection{Refining Camera Pose with NonlinearPnP}
+Using \texttt{scipy.optimize.leastsq} with 
+
 
 \section{Bundle Adjustment}
 
