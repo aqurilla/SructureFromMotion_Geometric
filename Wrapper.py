@@ -113,14 +113,14 @@ def main():
 	C, R, X0 = DisambiguateCameraPose_2Check(Cset, Rset, Xset, K, points_RANSAC)
 	P = ExtractCameraPose(K,C,R)
 
-	print("IM1--Initial--Mean Reprojection Error: %f" % np.mean(reprojErr(X0,points_RANSAC[:,2:],P)))
+	# print("IM1--Initial--Mean Reprojection Error: %f" % np.mean(reprojErr(X0,points_RANSAC[:,2:],P)))
 	'''
 	Non-linear optimization of triangulation
 	'''
 	# X0_nl are the non-linearly optimized points
 	X0_nl, residual = NonlinearTriangulation(X0, P0, P, points_RANSAC, max_nfev=100)
 
-	print("IM1--NLTriangulation--Mean Reprojection Error: %f" % np.mean(reprojErr(X0_nl,points_RANSAC[:,2:],P)))
+	# print("IM1--NLTriangulation--Mean Reprojection Error: %f" % np.mean(reprojErr(X0_nl,points_RANSAC[:,2:],P)))
 	# Display triangulation points obtained
 	# dispTriangulation(X0, X0_nl, P)
 
@@ -138,19 +138,19 @@ def main():
 
 		X_RANSAC, x_RANSAC , RC = PnPRANSAC(X, x, K)
 
-		print("IM%d--Initial--Mean Reprojection Error: %f" %\
-				(i+1,np.mean(reprojErr(X_RANSAC,x_RANSAC[:,2:],ExtractCameraPose(K,RC[:,3],RC[:,:3])))))
+		#print("IM%d--Initial--Mean Reprojection Error: %f" %\
+		#		(i+1,np.mean(reprojErr(X_RANSAC,x_RANSAC[:,2:],ExtractCameraPose(K,RC[:,3],RC[:,:3])))))
 
 		RC_nl = NonlinearPnP(X_RANSAC, x_RANSAC, K, RC)
 		Rnew = RC_nl[:,:3]
 		Cnew = RC_nl[:,-1]
 
 		CRCs = np.concatenate([CRCs,RC_nl.reshape([3,4,1])],2)
-		
+
 		Pnew = ExtractCameraPose(K,Cnew,Rnew)
 
-		print("IM%d--NonlinearPnP--Mean Reprojection Error: %f" %\
-		(i+1,np.mean(reprojErr(X_RANSAC,x_RANSAC[:,2:],Pnew))))
+		#print("IM%d--NonlinearPnP--Mean Reprojection Error: %f" %\
+		#(i+1,np.mean(reprojErr(X_RANSAC,x_RANSAC[:,2:],Pnew))))
 
 		Xnew = LinearTriangulation(P0, P, points_RANSAC)
 
@@ -158,15 +158,13 @@ def main():
 		# (i+1,np.mean(reprojErr(Xnew,points_RANSAC[:,2:],Pnew))))
 
 		Xnew_nl, residual = NonlinearTriangulation(Xnew, P0, Pnew, points_RANSAC, max_nfev=100)
-		
-		pdb.set_trace()
-		
+
 		im2world = impts2wpts(im2world, i+1, Xnew_nl, x_RANSAC)
 		# X = np.append(X, Xnew_nl, axis=0)
 
 		# BuildVisibilityMatrix
 		V,X,x = BuildVisibilityMatrix(6,im2world)
-
+		
 		# BundleAdjustment
 		newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
 

@@ -118,15 +118,16 @@ def Cam2sba(n, CRCs, K):
 		R = (CRCs[:,:,i])[:,:3]
 		C = (CRCs[:,:,i])[:,3]
 		sbainp[i,10:14] = R2q(R)
-		sbainp[i,11:] = C.reshape((1,3))
+		sbainp[i,14:] = C.reshape((1,3))
 
 	return sbainp
 
 def sba2Cam(newcams):
+	pdb.set_trace()
 	CRCs = np.zeros((3,4,newcams.shape[0]))
 	for i in range(newcams.shape[0]):
 		R = q2R(newcams[i,10:14])
-		C = newcams[i,11:]
+		C = newcams[i,14:]
 		CRCs[:,:3,i] = R
 		CRCs[:,3,i] = C
 
@@ -135,8 +136,10 @@ def sba2Cam(newcams):
 def BundleAdjustment(X,x,K,CRCs,V):
 	# X is 3xN, x is 2xN, CKs is 3x3xI, CRCs is 3x4xI, V is IxN
 	pts = sba.Points(X,x,V)
-	cams = Cam2sba(6, CRCs, K)
+	cams = sba.Cameras.fromDylan(Cam2sba(CRCs.shape[2], CRCs, K))
+	pdb.set_trace()
 	newcams, newpts, info = sba.SparseBundleAdjust(cams,pts)
 	newcams = sba2Cam(newcams)
+	pdb.set_trace()
 	newpts = newpts._getB()
 	return newcams, newpts, info
