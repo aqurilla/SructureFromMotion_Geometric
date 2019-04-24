@@ -23,9 +23,9 @@ def drawCorrespondences(imnum1, imnum2, points_RANSAC, imgpath):
 								,im2,[cv2.KeyPoint(x,y,4) for y,x in points_RANSAC[:,2:]],\
 								[cv2.DMatch(idx,idx,0.5) for idx in range(len(points_RANSAC))], None)
 
-	cv2.imshow('Output image', matchImg)
+	# cv2.imshow('Output image', matchImg)
 	cv2.imwrite("../Data/Correspondences_%d_%d.png" % (imnum1,imnum2),matchImg)
-	cv2.waitKey(0)
+	# cv2.waitKey(0)
 
 def dispTriangulation(X, X_nl, P):
 	# Display linear and non-linear triangulation output

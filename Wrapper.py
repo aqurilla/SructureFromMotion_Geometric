@@ -162,13 +162,15 @@ def main():
 		im2world = impts2wpts(im2world, i+1, Xnew_nl, x_RANSAC)
 		# X = np.append(X, Xnew_nl, axis=0)
 
-		# BuildVisibilityMatrix
-		V,X,x = BuildVisibilityMatrix(6,im2world)
-		
-		# BundleAdjustment
-		newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
+	pdb.set_trace()
+	# BuildVisibilityMatrix
+	V,X,x = BuildVisibilityMatrix(6,im2world)
 
-		pdb.set_trace()
+	pdb.set_trace()
+	# BundleAdjustment
+	newcams, newpts, info = BundleAdjustment(X,x,K,CRCs,V)
+
+	pdb.set_trace()
 
 if __name__ == '__main__':
 	main()

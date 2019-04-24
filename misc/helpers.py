@@ -137,9 +137,20 @@ def BundleAdjustment(X,x,K,CRCs,V):
 	# X is 3xN, x is 2xN, CKs is 3x3xI, CRCs is 3x4xI, V is IxN
 	pts = sba.Points(X,x,V)
 	cams = sba.Cameras.fromDylan(Cam2sba(CRCs.shape[2], CRCs, K))
-	pdb.set_trace()
 	newcams, newpts, info = sba.SparseBundleAdjust(cams,pts)
-	newcams = sba2Cam(newcams)
-	pdb.set_trace()
+	newcams = sba2Cam(toDyl(newcams))
 	newpts = newpts._getB()
 	return newcams, newpts, info
+
+def toDyl(cams):
+	result = np.zeros((cams.ncameras, 17),dtype=np.double)
+	result[:,0:10] = cams.camarray[:,0:10]
+	result[:,-6:] = cams.camarray[:,-6:]
+
+	# construct missing q0 real part of unit quaternions
+	for cam in range(cams.ncameras):
+		result[cam,-7] = np.sqrt(1-cams.camarray[cam,-6]**2.
+                                 -cams.camarray[cam,-5]**2.
+                                 -cams.camarray[cam,-4]**2.)
+
+	return result
