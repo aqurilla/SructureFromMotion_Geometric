@@ -1,1 +1,1 @@
-# Python program for implementing geometric structure from motion
+Python program for implementing geometric structure from motion
