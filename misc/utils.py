@@ -19,15 +19,26 @@ def drawCorrespondences(imnum1, imnum2, points_RANSAC, imgpath):
 	im2 = cv2.imread(imgpath+str(imnum2)+'.jpg',1)
 	matchesarr = np.array([i for i in range(points_RANSAC.shape[0])])
 
-	matchImg = cv2.drawMatches(im1,[cv2.KeyPoint(x,y,4) for y,x in points_RANSAC[:,:2]] \
-								,im2,[cv2.KeyPoint(x,y,4) for y,x in points_RANSAC[:,2:]],\
+	matchImg = cv2.drawMatches(im1,[cv2.KeyPoint(x,y,4) for x,y in points_RANSAC[:,:2]] \
+								,im2,[cv2.KeyPoint(x,y,4) for x,y in points_RANSAC[:,2:]],\
 								[cv2.DMatch(idx,idx,0.5) for idx in range(len(points_RANSAC))], None)
 
 	# cv2.imshow('Output image', matchImg)
 	cv2.imwrite("../Data/Correspondences_%d_%d.png" % (imnum1,imnum2),matchImg)
 	# cv2.waitKey(0)
 
-def dispTriangulation(X, X_nl, P):
+def dispTriangulation(imnum1, imnum2, X, P):
+	# Save linear triangulation output
+	# X - Nx3, P-3x4
+	plt.scatter(X[:,0], X[:,2], c="r",alpha=0.5, label="Linear Triangulation")
+	plt.scatter(P[0][3], P[2][3], c='b', marker=matplotlib.markers.CARETDOWN)
+	plt.xlabel("X")
+	plt.ylabel("Z")
+	plt.legend()
+	plt.savefig("../Data/LinearTriangulation_%d_%d.png" % (imnum1,imnum2))
+	# plt.show()
+
+def dispBothTriangulation(imnum1, imnum2, X, X_nl, P):
 	# Display linear and non-linear triangulation output
 	# X - Nx3, X_nl - Nx3, P-3x4
 	plt.scatter(X[:,0], X[:,2], c="r",alpha=0.5, label="Linear Triangulation")
@@ -36,7 +47,8 @@ def dispTriangulation(X, X_nl, P):
 	plt.xlabel("X")
 	plt.ylabel("Z")
 	plt.legend()
-	plt.show()
+	plt.savefig("../Data/Triangulation_%d_%d.png" % (imnum1,imnum2))
+	# plt.show()
 
 def parsePoints(imnum_1, imnum_2, txtpath):
 	# Parse the provided text files to extract the corresponding points
@@ -181,10 +193,12 @@ def DisambiguateCameraPose(Cset, Rset, Xset):
 		X = Xset[idx]
 
 		# Enforce condition [0 0 1]*X>0
-		X = X[X[:,2]>0]
+		# X = X[X[:,2]>0]
 
 		# num_d[idx] = sum(p > 0 for p in np.matmul((Rset[idx])[2,:], (Xset[idx]-Cset[idx]).T))
-		num_d[idx] = sum(p > 0 for p in np.matmul(R[2,:], (X-C).T))
+		# num_d[idx] = sum(p > 0 for p in np.matmul(R[2,:], (X-C).T))
+		num_d[idx] = np.matmul(R[2,:], (X-C).T).sum()
+	pdb.set_trace()
 
 	return Cset[np.argmax(num_d)], Rset[np.argmax(num_d)], Xset[np.argmax(num_d)]
 

@@ -4,9 +4,6 @@
 CMSC733 Spring 2019: Classical and Deep Learning Approaches for
 Geometric Computer Vision
 Project 3: Buildings built in minutes - An SfM Approach
-
-References:
-
 """
 
 # Code starts here:
@@ -52,7 +49,7 @@ def main():
 	points_RANSAC = GetInlierRANSAC(points_mat)
 
 	# Display correspondence image
-	drawCorrespondences(1,2,points_RANSAC, imgpath)
+	# drawCorrespondences(1,2,points_RANSAC, imgpath)
 
 	# Fundamental matrix using inliers
 	F_RANSAC = EstimateFundamentalMatrix(points_RANSAC)
@@ -122,7 +119,7 @@ def main():
 
 	print("IM1--NLTriangulation--Mean Reprojection Error: %f" % np.mean(reprojErr(X0_nl.transpose(),points_RANSAC[:,2:].transpose(),P)))
 	# Display triangulation points obtained
-	dispTriangulation(X0, X0_nl, P)
+	# dispTriangulation(X0, X0_nl, P)
 
 	CRCs = np.hstack([R,C.reshape([3,1])]).reshape([3,4,1])
 
@@ -133,7 +130,7 @@ def main():
 		print("Image #"+str(i))
 		points_mat = parsePoints(i, i+1, txtpath) # Parse points from matchingi.txt
 		points_RANSAC = GetInlierRANSAC(points_mat)
-		drawCorrespondences(i,i+1,points_RANSAC, imgpath)
+		# drawCorrespondences(i,i+1,points_RANSAC, imgpath)
 		X,x = getWorldPts(im2world,i,points_RANSAC)
 
 		RC = PnPRANSAC(X, x, K)
@@ -158,14 +155,15 @@ def main():
 				(i+1,np.mean(reprojErr(Xnew.transpose(),points_RANSAC[:,2:].transpose(),Pnew))))
 
 		Xnew_nl, residual = NonlinearTriangulation(Xnew, P0, Pnew, points_RANSAC, max_nfev=100)
-		
-		dispTriangulation(Xnew, Xnew_nl, P)
+
+		# dispTriangulation(Xnew, Xnew_nl, P)
 
 		print("IM%d--NonlinearTriangulation--Mean Reprojection Error: %f" %\
 		(i+1,np.mean(reprojErr(Xnew_nl.transpose(),points_RANSAC[:,2:].transpose(),Pnew))))
 
 		im2world = impts2wpts(im2world, i+1, Xnew_nl, points_RANSAC[:,2:])
 		im2world = impts2wpts(im2world, i, Xnew_nl, points_RANSAC[:,:2])
+		pdb.set_trace()
 
 	# BuildVisibilityMatrix
 	V,X,x = BuildVisibilityMatrix(6,im2world)
